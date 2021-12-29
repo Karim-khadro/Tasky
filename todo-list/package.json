@@ -1,0 +1,55 @@
+{
+  "name": "todo-list",
+  "version": "0.1.0",
+  "proxy": "http://localhost:8081",
+  "private": true,
+  "dependencies": {
+    "@craco/craco": "^6.4.3",
+    "@reduxjs/toolkit": "^1.7.1",
+    "@testing-library/jest-dom": "^5.16.1",
+    "@testing-library/react": "^11.2.7",
+    "@testing-library/user-event": "^12.8.3",
+    "date-fns": "^2.27.0",
+    "dotenv": "^10.0.0",
+    "env-cmd": "^10.1.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-redux": "^7.2.6",
+    "react-router-dom": "^6.2.1",
+    "react-scripts": "4.0.3",
+    "reactjs-popup": "^2.0.5",
+    "redux": "^4.1.2",
+    "typescript": "^4.5.4",
+    "web-vitals": "^1.1.2"
+  },
+  "scripts": {
+    "start": "env-cmd craco start",
+    "build": "env-cmd craco build",
+    "test": "env-cmd craco test",
+    "eject": "react-scripts eject",
+    "build:staging": "env-cmd -f .env craco build"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "autoprefixer": "^9.8.8",
+    "postcss": "^7.0.39",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.17"
+  }
+}
