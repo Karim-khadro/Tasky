@@ -1,6 +1,7 @@
 var mysql = require('mysql');
 require('custom-env').env('dev')
 const dotenv = require("dotenv");
+const jwt = require('jsonwebtoken');
 
 // Configs
 dotenv.config()
@@ -30,7 +31,7 @@ function getListId(listname, userid) {
    console.log("getListId function");
    var sql = "SELECT id FROM lists WHERE name = ? AND user_id = ?";
    return new Promise((resolve, reject) => {
-      con.query(    
+      con.query(
          sql,
          [listname, userid],
          (err, result) => {
@@ -40,5 +41,11 @@ function getListId(listname, userid) {
    });
 }
 
+
+function generateAccessToken(userid) {
+   return jwt.sign(userid, process.env.TOKEN_SECRET, { expiresIn: process.env.TOKEN_AGE });
+}
+
+module.exports.generateAccessToken = generateAccessToken;
 module.exports.getListId = getListId;
 module.exports.con = con; 

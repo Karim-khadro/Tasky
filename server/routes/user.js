@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const {
-   v1: uuidv1,
-} = require('uuid');
+const { v4: uuidv4 } = require('uuid');
 const util = require('../util');
+const jwt = require('jsonwebtoken');
 
 // * DONE
 // Get user info 
@@ -13,15 +12,16 @@ const util = require('../util');
 //         errormsg: when no user is found a message is returned
 //         userid
 //         username
+// TODO: check password & salt it 
 router.post('/login', (req, res) => {
    console.log("User info");
    var email = req.body.email.toLowerCase();
    var password = req.body.password;
 
-   var sql = "SELECT id,name FROM users WHERE email = ? AND password = ?";
+   var sql = "SELECT id,name FROM users WHERE email = ?";
    var response = {}
 
-   util.con.query(sql, [email, password], function (err, result) {
+   util.con.query(sql, [email], function (err, result) {
       console.log(result[0]);
       if (err) {
          throw err;
@@ -43,11 +43,15 @@ router.post('/login', (req, res) => {
                   console.log(err);
                   throw err;
                }
-               console.log(res.affectedRows + " record updated after login");
+               // console.log(res.affectedRows + " record updated after login");
             });
+
+            // User's token
+            const token = util.generateAccessToken({ userid: result[0].id });
 
             response = {
                isauth: true,
+               token: token,
                userid: result[0].id,
                username: result[0].name
             };
@@ -72,7 +76,7 @@ router.post('/signup', (req, res) => {
    var password = req.body.password;
    var createdAt = new Date();
    createdAt = createdAt.toISOString().slice(0, 19).replace('T', ' ');
-   var id = uuidv1();
+   var id = uuidv4();
 
    var sql = "INSERT INTO users (id,name,email,password,last_login,created_at) VALUES ?";
    var values = [[id, name, email, password, createdAt, createdAt]];

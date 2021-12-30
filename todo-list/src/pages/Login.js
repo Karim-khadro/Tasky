@@ -30,7 +30,8 @@ export default function Login(props) {
             .then(res => {
                 console.log(res);
                 if (res.isauth) {
-                    setErrorMsg("");                  
+                    setErrorMsg("");        
+                    console.log(res.token);    
                     props.getusername(res.username);
                     props.userId(res.userid);   
                     props.loggedin(true);
