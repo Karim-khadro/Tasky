@@ -3,6 +3,11 @@ const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
 const util = require('../util');
 const jwt = require('jsonwebtoken');
+require('custom-env').env('dev')
+const dotenv = require("dotenv");
+
+// Configs
+dotenv.config()
 
 // * DONE
 // Get user info 
@@ -47,11 +52,22 @@ router.post('/login', (req, res) => {
             });
 
             // User's token
-            const token = util.generateAccessToken({ userid: result[0].id });
+            const tokeninfo = { userid: result[0].id, username: result[0].name }
+            const token = util.generateAccessToken(tokeninfo);
+            const refresh_token = util.generateAccessToken(tokeninfo, true);
 
+            // res.cookie('token', refresh_token, {
+            //    expires: new Date(Date.now() + 50000), // time until expiration
+            //    secure: false, // set to true if your using https
+            //    httpOnly: true,
+            // });
+            var refTokenAge = process.env.REFRESH_TOKEN_AGE.replace("s", "");
+            refTokenAge = Math.floor(parseInt(refTokenAge) - parseInt(refTokenAge) * 0.3)
             response = {
                isauth: true,
                token: token,
+               refreshtoken: refresh_token,
+               refreshtoken_age: refTokenAge,
                userid: result[0].id,
                username: result[0].name
             };
@@ -104,6 +120,71 @@ router.post('/signup', (req, res) => {
          res.end(JSON.stringify(response));
       }
    });
+})
+
+
+router.use((req, res, next) => {
+   const token = req.headers.authorization.split(' ')[1]; // Get your token from the request
+   const tokenType = req.headers.token;
+   if (tokenType == "token") {
+      jwt.verify(token, process.env.TOKEN_SECRET, function (err, decoded) {
+         if (err) {
+           
+            throw new Error(err)
+         }  // Manage different errors here (Expired, untrusted...)
+         req.auth = decoded // If no error, token info is returned in 'decoded'
+         next()
+      });
+   }
+   else if (tokenType == "ref_token") {
+      jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, function (err, decoded) {
+         if (err) {
+            console.log(err);
+            // if (err.name == "TokenExpiredError")
+            //    console.log("HELLO");
+            // else
+            throw new Error(err)
+         }  // Manage different errors here (Expired, untrusted...)
+         req.auth = decoded // If no error, token info is returned in 'decoded'
+         next()
+      });
+   }
+})
+
+router.get('/newtoken', (req, res) => {
+   console.log("New token");
+   var authorization = req.headers.authorization.split(' ')[1];
+   // console.log("\nauthorization: ");
+   // console.log(authorization);
+   var decoded;
+   var response = {}
+
+   try {
+      console.log("\ndecoded:");
+      decoded = jwt.verify(authorization, process.env.REFRESH_TOKEN_SECRET);
+
+      console.log(decoded);
+
+      // console.log(decoded);
+   } catch (e) {
+      res.status(401).send('unauthorized');
+   }
+   // TODO: make it function
+   const tokeninfo = { userid: decoded.userid, username: decoded.username }
+   const token = util.generateAccessToken(tokeninfo);
+   const refresh_token = util.generateAccessToken(tokeninfo, true);
+   var refTokenAge = process.env.REFRESH_TOKEN_AGE.replace("s", "");
+   refTokenAge = Math.floor(parseInt(refTokenAge) - parseInt(refTokenAge) * 0.3)
+
+   response = {
+      isauth: true,
+      token: token,
+      refreshtoken: refresh_token,
+      refreshtoken_age: refTokenAge,
+      userid: decoded.userid,
+      username: decoded.username
+   };
+   res.end(JSON.stringify(response));
 })
 
 module.exports = router; 

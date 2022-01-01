@@ -42,10 +42,15 @@ function getListId(listname, userid) {
 }
 
 
-function generateAccessToken(userid) {
+function generateAccessToken(userid,refresh= false) {
+   if(refresh)
+      return jwt.sign(userid, process.env.REFRESH_TOKEN_SECRET, { expiresIn: process.env.REFRESH_TOKEN_AGE });
    return jwt.sign(userid, process.env.TOKEN_SECRET, { expiresIn: process.env.TOKEN_AGE });
 }
 
+
+
+ 
 module.exports.generateAccessToken = generateAccessToken;
 module.exports.getListId = getListId;
 module.exports.con = con; 

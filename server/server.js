@@ -12,10 +12,13 @@ const dotenv = require("dotenv");
 process.on('unhandledRejection', function(reason, promise) {
    console.log(promise);
 });
+const cookieParser = require("cookie-parser");
+
 // Configs
 dotenv.config()
 app.use(cors(corsOptions))
 app.use(express.json())
+app.use(cookieParser());
 // app.use(bodyparser.json());  
 
 

@@ -11,6 +11,8 @@ const util = require('../util');
 //         Throw error if not
 router.get('/load', (req, res) => {
    console.log("Get all user's list");
+
+
    var userid = req.query.userid;
    var response = {};
    var sql = "SELECT name FROM lists WHERE user_id = ?";

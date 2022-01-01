@@ -422,6 +422,7 @@ const Content = ({ activeList, setActiveList, username, userId }) => {
     console.log("No active list");
     return (
       <div className="flex flex-col">
+        <h1>{username}</h1>
         <div className="text-xl font-bold text-gray-600 border-b-2 border-green-200 pt-6 pb-2 px-6">List {activeList} </div>
         {/*Body div */}
 

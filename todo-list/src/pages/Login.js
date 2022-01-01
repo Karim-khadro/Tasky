@@ -3,22 +3,24 @@
 // 
 import { useNavigate } from 'react-router-dom';
 import { useRef, useState } from "react";
+import {encrypt, renewToken} from "../utile";
 
 
 export default function Login(props) {
 
     const emailInput = useRef();
     const passwordInput = useRef();
-    const [errorMsg,setErrorMsg] = useState("");
+    const [errorMsg, setErrorMsg] = useState("");
     const navigate = useNavigate();
-
+    // console.log("Login: ");
+    // console.log(props);
     const handleSubmit = (e) => {
         e.preventDefault();
         const email = emailInput.current.value;
         const password = passwordInput.current.value;
-        
+
         // Verify user info with the server
-        fetch(process.env.REACT_APP_BACKEND_API_URL+'/user/login', {
+        fetch(process.env.REACT_APP_BACKEND_API_URL + '/user/login', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json, text/plain, */*',
@@ -30,12 +32,20 @@ export default function Login(props) {
             .then(res => {
                 console.log(res);
                 if (res.isauth) {
-                    setErrorMsg("");        
-                    console.log(res.token);    
+                    setErrorMsg("");
+                    // Encrypt the refresh token & store it
+                    const cipherToekn = encrypt(res.refreshtoken);
+                    localStorage.setItem('refreshToken', cipherToekn);
+
+                    // console.log('Encrypt Data -')
+                    // console.log(cipherToekn);
+
                     props.getusername(res.username);
-                    props.userId(res.userid);   
+                    props.userId(res.userid);
                     props.loggedin(true);
-                    navigate("/");                   
+                    setInterval(renewToken, parseInt(res.refreshtoken_age)*1000);
+
+                    navigate("/");
                 }
                 else {
                     setErrorMsg(res.errormsg);
@@ -57,15 +67,15 @@ export default function Login(props) {
                         <label>Password</label>
                         <input required="required" ref={passwordInput} type="password" id="password" className="border-2 w-full mb-4 h-8"></input>
                     </div>
-                    <h2 className=' text-red-600 mb-3'>{errorMsg}</h2> 
+                    <h2 className=' text-red-600 mb-3'>{errorMsg}</h2>
 
                     <div className="ml-2 mb-6 ">
                         <button type="submit" className=" bg-green-500 rounded-lg border-2 border-green-500 w-1/3 h-10 text-xl text-white ">Login</button>
                     </div>
-                    
+
                 </form>
                 <a href='/register' className="ml-2 mt-4 text-blue-600 underline ">New user?</a>
-                
+
 
             </div>
 
