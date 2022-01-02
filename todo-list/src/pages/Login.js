@@ -35,7 +35,7 @@ export default function Login(props) {
                     setErrorMsg("");
                     // Encrypt the refresh token & store it
                     const cipherToekn = encrypt(res.refreshtoken);
-                    localStorage.setItem('refreshToken', cipherToekn);
+                    sessionStorage.setItem('refreshToken', cipherToekn);
 
                     // console.log('Encrypt Data -')
                     // console.log(cipherToekn);

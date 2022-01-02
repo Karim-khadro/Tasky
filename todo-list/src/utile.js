@@ -25,7 +25,6 @@ export function encrypt(data) {
 export function renewToken() {
     //get the mins of the current time
     console.log('renewToken');
-
     var refToken = localStorage.getItem('refreshToken');
     if (refToken) {
         refToken = decrypt(refToken);

@@ -129,7 +129,7 @@ router.use((req, res, next) => {
    if (tokenType == "token") {
       jwt.verify(token, process.env.TOKEN_SECRET, function (err, decoded) {
          if (err) {
-           
+
             throw new Error(err)
          }  // Manage different errors here (Expired, untrusted...)
          req.auth = decoded // If no error, token info is returned in 'decoded'
@@ -140,10 +140,11 @@ router.use((req, res, next) => {
       jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, function (err, decoded) {
          if (err) {
             console.log(err);
-            // if (err.name == "TokenExpiredError")
-            //    console.log("HELLO");
-            // else
-            throw new Error(err)
+            if (err.name != "TokenExpiredError") {
+               throw new Error(err)
+            }
+
+
          }  // Manage different errors here (Expired, untrusted...)
          req.auth = decoded // If no error, token info is returned in 'decoded'
          next()
@@ -164,27 +165,31 @@ router.get('/newtoken', (req, res) => {
       decoded = jwt.verify(authorization, process.env.REFRESH_TOKEN_SECRET);
 
       console.log(decoded);
+      // TODO: make it function
+      const tokeninfo = { userid: decoded.userid, username: decoded.username }
+      const token = util.generateAccessToken(tokeninfo);
+      const refresh_token = util.generateAccessToken(tokeninfo, true);
+      var refTokenAge = process.env.REFRESH_TOKEN_AGE.replace("s", "");
+      refTokenAge = Math.floor(parseInt(refTokenAge) - parseInt(refTokenAge) * 0.3)
+
+      response = {
+         isauth: true,
+         token: token,
+         refreshtoken: refresh_token,
+         refreshtoken_age: refTokenAge,
+         userid: decoded.userid,
+         username: decoded.username
+      };
+      res.end(JSON.stringify(response));
 
       // console.log(decoded);
    } catch (e) {
-      res.status(401).send('unauthorized');
+      response = {
+         isauth: false
+      };
+      res.status(401).send(response);
    }
-   // TODO: make it function
-   const tokeninfo = { userid: decoded.userid, username: decoded.username }
-   const token = util.generateAccessToken(tokeninfo);
-   const refresh_token = util.generateAccessToken(tokeninfo, true);
-   var refTokenAge = process.env.REFRESH_TOKEN_AGE.replace("s", "");
-   refTokenAge = Math.floor(parseInt(refTokenAge) - parseInt(refTokenAge) * 0.3)
 
-   response = {
-      isauth: true,
-      token: token,
-      refreshtoken: refresh_token,
-      refreshtoken_age: refTokenAge,
-      userid: decoded.userid,
-      username: decoded.username
-   };
-   res.end(JSON.stringify(response));
 })
 
 module.exports = router; 

@@ -61,7 +61,7 @@ const CreateTask = (props) => {
         }
     }
     return (
-        <div id="newtask">
+        <div id="newtask" name="newtask">
             <div className="w-full max-w-4xl m-auto mt-3 ">
                 < h1 className="text-3xl  text-gray-600">{props.text}</h1>
             </div>

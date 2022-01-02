@@ -1,7 +1,7 @@
 import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
-import { decrypt, renewToken } from "./utile";
+import { decrypt, renewToken,encrypt } from "./utile";
 import {
   Routes,
   Route,
@@ -17,16 +17,11 @@ export default function App() {
   const [userId, setUserId] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  // localStorage.removeItem('refreshToken');
-
-
-  //   window.onclose  = function() {
-  //     localStorage.clear();
-  //  }
+  // sessionStorage.removeItem('refreshToken');
 
   useEffect(async () => {
     async function componentDidMount() {
-      var refToken = localStorage.getItem('refreshToken');
+      var refToken = sessionStorage.getItem('refreshToken');
       if (refToken) {
         refToken = await decrypt(refToken);
         const response = await fetch(process.env.REACT_APP_BACKEND_API_URL + '/user/newtoken', {
@@ -40,10 +35,15 @@ export default function App() {
         const res = await response.json();
         console.log("useEffect res : ");
         console.log(res);
+
         setAuth(res.isauth);
-        setUsername(res.username);
-        setUserId(res.userid);
-        setInterval(renewToken, parseInt(res.refreshtoken_age) * 1000);
+        if (res.isauth) {
+          const cipherToekn = encrypt(res.refreshtoken);
+          sessionStorage.setItem('refreshToken', cipherToekn);
+          setUsername(res.username);
+          setUserId(res.userid);
+          setInterval(renewToken, parseInt(res.refreshtoken_age) * 1000);
+        }
       }
     };
     await componentDidMount();
