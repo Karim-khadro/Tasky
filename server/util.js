@@ -42,10 +42,10 @@ function getListId(listname, userid) {
 }
 
 
-function generateAccessToken(userid,refresh= false) {
+function generateAccessToken(data,refresh= false) {
    if(refresh)
-      return jwt.sign(userid, process.env.REFRESH_TOKEN_SECRET, { expiresIn: process.env.REFRESH_TOKEN_AGE });
-   return jwt.sign(userid, process.env.TOKEN_SECRET, { expiresIn: process.env.TOKEN_AGE });
+      return jwt.sign(data, process.env.REFRESH_TOKEN_SECRET, { expiresIn: process.env.REFRESH_TOKEN_AGE });
+   return jwt.sign(data, process.env.TOKEN_SECRET, { expiresIn: process.env.TOKEN_AGE });
 }
 
 

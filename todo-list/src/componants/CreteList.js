@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from "react";
-
+import {postRequest, getRequest} from "../utile";
 const CreteList = (props) => {
     const nameInput = useRef();
     const [nameValue, setNameValue] = useState("");
@@ -10,7 +10,7 @@ const CreteList = (props) => {
             setNameValue(props.list);
     }, [props.list]);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         const name = nameInput.current.value;
         e.preventDefault();
 
@@ -20,43 +20,58 @@ const CreteList = (props) => {
         }
         else {
             if (props.list) {
-                fetch(process.env.REACT_APP_BACKEND_API_URL+'/list/edit', {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json, text/plain, */*',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ "list": props.list, "newlist": name, "userid": props.userId })
+                var res = await postRequest('/list/edit', props.token, JSON.stringify({ "list": props.list, "newlist": name }))
+                if (res === true) {
+                    props.newlist(name);
+                }
+                // fetch(process.env.REACT_APP_BACKEND_API_URL+'/list/edit', {
+                //     method: 'POST',
+                //     headers: {
+                //         'Accept': 'application/json, text/plain, */*',
+                //         'Content-Type': 'application/json', 
+                //         "token": "token",
+                //         'Authorization': "Bearer " + props.token
+                //     },
+                //     body: JSON.stringify({ "list": props.list, "newlist": name })
 
-                }).then(res => res.json())
-                    .then(res => {
-                        if (res === true) {
-                            props.newlist(name);
-                        }
+                // }).then(res => res.json())
+                //     .then(res => {
+                //         if (res === true) {
+                //             props.newlist(name);
+                //         }
 
-                    })
-                    .catch(err => console.error(err));
+                //     })
+                //     .catch(err => console.error(err));
             }
             else {
-                fetch(process.env.REACT_APP_BACKEND_API_URL+'/list/create', {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json, text/plain, */*',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ "list": name, "userid": props.userId })
+                var res = await postRequest('/list/create', props.token, JSON.stringify({ "list": name }))
+                if (res === true) {
+                    props.newlist(name);
+                }
+                if (res.error) {
+                    setErrormsg(res.error);
+                }
+                // fetch(process.env.REACT_APP_BACKEND_API_URL+'/list/create', {
+                //     method: 'POST',
+                //     headers: {
+                //         'Accept': 'application/json, text/plain, */*',
+                //         'Content-Type': 'application/json', 
+                //         "token": "token",
+                //         'Authorization': "Bearer " + props.token
+                //     },
+                //     body: JSON.stringify({ "list": name })
 
-                }).then(res => res.json())
-                    .then(res => {
-                        console.log("res: " + res);
-                        if (res === true) {
-                            props.newlist(name);
-                        }
-                        if (res.error) {
-                            setErrormsg(res.error);
-                        }
-                    })
-                    .catch(err => console.error(err));
+                // }).then(res => res.json())
+                //     .then(res => {
+                //         console.log("res: " + res);
+                //         if (res === true) {
+                //             props.newlist(name);
+                //         }
+                //         if (res.error) {
+                //             setErrormsg(res.error);
+                //         }
+                //     })
+                //     .catch(err => console.error(err));
             }
         }
     }

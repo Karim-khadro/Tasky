@@ -11,9 +11,10 @@ const util = require('../util');
 //         Throw error if not
 router.get('/load', (req, res) => {
    console.log("Get all user's list");
+   req.auth
+   console.log(req.auth);
 
-
-   var userid = req.query.userid;
+   var userid = req.auth.userid;
    var response = {};
    var sql = "SELECT name FROM lists WHERE user_id = ?";
 
@@ -43,7 +44,7 @@ router.get('/tasks', async (req, res) => {
    console.log("Get all list's tasks");
 
    var listname = req.query.list;
-   var userid = req.query.userid;
+   var userid = req.auth.userid;
    var response = {}
    var sql = "SELECT id,name,status,date FROM tasks WHERE list_id = ? ORDER BY date";
    var listId = await util.getListId(listname, userid);
@@ -76,7 +77,7 @@ router.get('/tasks', async (req, res) => {
 router.post('/delete', (req, res) => {
    console.log("Delete list");
    var listname = req.body.list;
-   var userid = req.body.userid;
+   var userid = req.auth.userid;
    var sql_q = "DELETE FROM lists WHERE user_id = ? AND name = ? ";
 
    util.con.query(sql_q, [userid, listname], function (err, result) {
@@ -84,7 +85,7 @@ router.post('/delete', (req, res) => {
          console.log(err);
          throw err;
       }
-      console.log(res.affectedRows + " record updated after login");
+      console.log(res.affectedRows + " record updated ");
       res.end(JSON.stringify(true));
    });
 
@@ -101,7 +102,7 @@ router.post('/edit', (req, res) => {
    console.log("Edit list");
    var listname = req.body.list;
    var newlistname = req.body.newlist;
-   var userid = req.body.userid;
+   var userid = req.auth.userid;
    var modifAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
    var sql_q = "UPDATE lists SET name = ?,modified_at=? WHERE user_id = ? AND name = ? ";
 
@@ -124,7 +125,7 @@ router.post('/edit', (req, res) => {
 router.post('/create', (req, res) => {
    console.log("Add new list");
    var listname = req.body.list;
-   var userid = req.body.userid;
+   var userid = req.auth.userid;
    var createdAt = new Date();
    createdAt = createdAt.toISOString().slice(0, 19).replace('T', ' ');
    var response = {};

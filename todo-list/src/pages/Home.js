@@ -2,22 +2,23 @@ import { useState, useEffect } from 'react';
 import Task from '../componants/Task';
 import CreateTask from '../componants/CreateTask';
 import CreteList from '../componants/CreteList'
+import { postRequest, getRequest } from "../utile";
 
 const Home = (props) => {
   const [activeList, setActiveList] = useState();
   return (
     <div className="h-screen grid grid-cols-custom-sidenav-layout">
-      <Sidenav activeList={activeList} setActiveList={setActiveList} username={props.username} userId={props.userId} />
-      <Content activeList={activeList} setActiveList={setActiveList} username={props.username} userId={props.userId} />
+      <Sidenav activeList={activeList} setActiveList={setActiveList} username={props.username} token={props.token} />
+      <Content activeList={activeList} setActiveList={setActiveList} username={props.username} token={props.token} />
     </div>
   );
 }
 
-const Sidenav = ({ activeList, setActiveList, username, userId }) => {
+const Sidenav = ({ activeList, setActiveList, username, token }) => {
   return (
     <div className=' bg-menu text-green-50 px-4 py-6 w-full max-w-6xl'>
       <SidenavHeader />
-      <SidenavMenu activeList={activeList} setActiveList={setActiveList} username={username} userId={userId} />
+      <SidenavMenu activeList={activeList} setActiveList={setActiveList} username={username} token={token} />
     </div>
   )
 }
@@ -28,14 +29,14 @@ const SidenavHeader = () => (
   </div>
 )
 
-const SidenavMenu = ({ activeList, setActiveList, username, userId }) => {
+const SidenavMenu = ({ activeList, setActiveList, username, token }) => {
   const handelCreateList = (e) => {
     setActiveList("#new");
   }
   return (
     //  Get existing lists from server
     <div>
-      <GetLists activeList={activeList} setActiveList={setActiveList} username={username} userId={userId} />
+      <GetLists activeList={activeList} setActiveList={setActiveList} username={username} token={token} />
       <button className='mt-8 text-right text-2xl  hover:text-gray-400' onClick={handelCreateList}>
         Create New List</button>
     </div>
@@ -43,25 +44,17 @@ const SidenavMenu = ({ activeList, setActiveList, username, userId }) => {
 }
 
 // Get lists name dynamiclly from the server 
-const GetLists = ({ activeList, setActiveList, username, userId }) => {
+const GetLists = ({ activeList, setActiveList, username, token }) => {
   const [lists, setLists] = useState([]);
 
   useEffect(() => {
     fetchLists();
   }, [activeList]);
 
-  const fetchLists = () => {
-    fetch(process.env.REACT_APP_BACKEND_API_URL + '/list/load?userid=' + encodeURIComponent(userId), {
-      method: 'Get',
-      headers: {
-        'Accept': 'application/json, text/plain, */*'
-      }
-    }).then(res => res.json())
-      .then(res => {
-        setLists(res.lists);
-      })
-      .catch(err => console.error(err));
 
+  const fetchLists = async () => {
+    var resultGet = await getRequest('/list/load', token)
+    setLists(resultGet.lists);
   };
 
   if (lists) {
@@ -94,7 +87,7 @@ const GetLists = ({ activeList, setActiveList, username, userId }) => {
 
 };
 
-const Content = ({ activeList, setActiveList, username, userId }) => {
+const Content = ({ activeList, setActiveList, username, token }) => {
   const [items, setItems] = useState([]);
   const [taskAdded, setTaskAdded] = useState();
   const [taskAModified, setTaskAModified] = useState(false);
@@ -111,18 +104,24 @@ const Content = ({ activeList, setActiveList, username, userId }) => {
   }, [taskAdded, activeList, taskAModified]);
 
   // Get tasks of a list
-  const fetchItems = () => {
-    fetch(process.env.REACT_APP_BACKEND_API_URL + '/list/tasks?list=' + encodeURIComponent(activeList) + '&userid=' + encodeURIComponent(userId), {
-      method: 'Get',
-      headers: {
-        'Accept': 'application/json, text/plain, */*'
-      },
-    }).then(res => res.json())
-      .then(res => {
-        console.log(`res: ${res.items}`);
-        setItems(res.items);
-      })
-      .catch(err => console.error(err));
+  const fetchItems = async () => {
+    var resultGet = await getRequest('/list/tasks?list=' + encodeURIComponent(activeList), token)
+    setItems(resultGet.items);
+
+    // fetch(process.env.REACT_APP_BACKEND_API_URL + '/list/tasks?list=' + encodeURIComponent(activeList) + '&token=' + encodeURIComponent(token), {
+    //   method: 'Get',
+    //   headers: {
+    //     'Accept': 'application/json, text/plain, */*', 
+    //     "token": "token",
+    //     'Authorization': "Bearer " + token
+
+    //   },
+    // }).then(res => res.json())
+    //   .then(res => {
+    //     console.log(`res: ${res.items}`);
+    //     setItems(res.items);
+    //   })
+    //   .catch(err => console.error(err));
   };
 
 
@@ -131,25 +130,33 @@ const Content = ({ activeList, setActiveList, username, userId }) => {
   }
 
   // Send request to server and re-render
-  const handelDeleteList = () => {
-    fetch('/list/delete', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ "list": activeList, "userid": userId })
+  const handelDeleteList = async () => {
+    var resultpost = await postRequest('/list/delete', token, JSON.stringify({ "list": activeList, "token": token }))
+    if (resultpost === true) {
+      setActiveList("");
+      setTaskAModified(true);
+    }
+    console.log(resultpost)
+    // fetch(process.env.REACT_APP_BACKEND_API_URL +'/list/delete', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Accept': 'application/json, text/plain, */*',
+    //     'Content-Type': 'application/json', 
+    //     "token": "token",
+    //     'Authorization': "Bearer " + token
+    //   },
+    //   body: JSON.stringify({ "list": activeList, "token": token })
 
-    }).then(res => res.json())
-      .then(res => {
-        console.log("res: " + res);
-        if (res === true) {
-          setActiveList("");
-          setTaskAModified(true);
-        }
+    // }).then(res => res.json())
+    //   .then(res => {
+    //     console.log("res: " + res);
+    //     if (res === true) {
+    //       setActiveList("");
+    //       setTaskAModified(true);
+    //     }
 
-      })
-      .catch(err => console.error(err));
+    //   })
+    //   .catch(err => console.error(err));
   }
 
   const Buttons = () => (
@@ -187,7 +194,7 @@ const Content = ({ activeList, setActiveList, username, userId }) => {
         progTasks.map((progitem) => {
           return (
             <div>
-              <Task id={progitem.id} name={progitem.name} date={progitem.date} status={progitem.status} listname={activeList}
+              <Task token={token} id={progitem.id} name={progitem.name} date={progitem.date} status={progitem.status} listname={activeList}
                 taskAModified={taskAModified => setTaskAModified(taskAModified)} editTask={editTask => setEditTask(editTask)} />
             </div>
           );
@@ -208,7 +215,7 @@ const Content = ({ activeList, setActiveList, username, userId }) => {
         doneTasks.map((doneitem) => {
           return (
             <div>
-              <Task id={doneitem.id} name={doneitem.name} date={doneitem.date} status={doneitem.status} listname={activeList}
+              <Task token={token} id={doneitem.id} name={doneitem.name} date={doneitem.date} status={doneitem.status} listname={activeList}
                 taskAModified={taskAModified => setTaskAModified(taskAModified)} editTask={editTask => setEditTask(editTask)} />
             </div>
           );
@@ -229,7 +236,7 @@ const Content = ({ activeList, setActiveList, username, userId }) => {
         lateTasks.map((lateitem) => {
           return (
             <div>
-              <Task id={lateitem.id} name={lateitem.name} date={lateitem.date} status={lateitem.status} listname={activeList}
+              <Task token={token} id={lateitem.id} name={lateitem.name} date={lateitem.date} status={lateitem.status} listname={activeList}
                 taskAModified={taskAModified => setTaskAModified(taskAModified)} editTask={editTask => setEditTask(editTask)} />
             </div>
           );
@@ -317,10 +324,28 @@ const Content = ({ activeList, setActiveList, username, userId }) => {
 
     }
   }
+
+  // TODO: Work here
+  const handelLogOut= () =>{
+    sessionStorage.removeItem('refreshToken');
+    sessionStorage.removeItem('isAuth');
+    // refresh after removing refresh token
+    window.location.reload();
+  }
+
+  const Header = () => {
+    return (
+      <div className="w-full relative   ">
+        <div className=" absolute left-0  text-xl font-bold text-gray-600  pt-6 pb-2 px-6">List {activeList} </div>
+        <div className=" absolute right-0 pt-6 pb-2 ">
+          <button className="hover:bg-red-500  bg-red-400  px-8 py-2 mr-12 rounded-lg text-white text-lg" onClick={handelLogOut}>Log out</button>
+        </div>
+        <div className="relative top-20 border-b-2 border-green-200 "></div>
+      </div>
+    )
+
+  }
   // END 
-
-
-
 
   if (activeList) {
     // Create new list
@@ -330,7 +355,7 @@ const Content = ({ activeList, setActiveList, username, userId }) => {
         <div className="flex flex-col">
           <div className="text-xl font-bold text-gray-600 border-b-2 border-green-200 pt-6 pb-2 px-6">New list </div>
           {/*Body div */}
-          <CreteList text="CREATE NEW LIST" buttonText="CREATE LIST" newlist={activeList => setActiveList(activeList)} userId={userId} />
+          <CreteList token={token} text="CREATE NEW LIST" buttonText="CREATE LIST" newlist={activeList => setActiveList(activeList)} token={token} />
 
         </div>
       );
@@ -343,8 +368,7 @@ const Content = ({ activeList, setActiveList, username, userId }) => {
           <div className="text-xl font-bold text-gray-600 border-b-2 border-green-200 pt-6 pb-2 px-6">New list </div>
           {/*Body div */}
           {/* taskAdded is used to refresh without creating new var :p */}
-          <CreteList list={activeList.split("-")[1]} text={"EDIT LIST " + activeList.split("-")[1]} buttonText="EDIT LIST" newlist={activeList => setActiveList(activeList)} userId={userId} />
-
+          <CreteList token={token} list={activeList.split("-")[1]} text={"EDIT LIST " + activeList.split("-")[1]} buttonText="EDIT LIST" newlist={activeList => setActiveList(activeList)} token={token} />
         </div>
       );
     }
@@ -356,10 +380,11 @@ const Content = ({ activeList, setActiveList, username, userId }) => {
           console.log("Edit task");
           return (
             <div className="flex flex-col">
-              <div className="text-xl font-bold text-gray-600 border-b-2 border-green-200 pt-6 pb-2 px-6">List {activeList} </div>
+              <Header />
+              {/* <div className="text-xl font-bold text-gray-600 border-b-2 border-green-200 pt-6 pb-2 px-6">List {activeList} </div> */}
               {/*Body div */}
               <div >
-                <CreateTask taskid={editTask[3]} edit={true} name={editTask[1]} date={editTask[2]} listname={activeList} taskAdded={taskAdded => setTaskAdded(taskAdded)} text="EDIT TASK" buttonText="EDIT TASK" userId={userId} />
+                <CreateTask token={token} taskid={editTask[3]} edit={true} name={editTask[1]} date={editTask[2]} listname={activeList} taskAdded={taskAdded => setTaskAdded(taskAdded)} text="EDIT TASK" buttonText="EDIT TASK" token={token} />
                 {/* Edit/Delete list buttons */}
                 <Buttons />
                 {items.map((item) => {
@@ -372,7 +397,6 @@ const Content = ({ activeList, setActiveList, username, userId }) => {
                 })}
                 <TasksOfList />
               </div>
-
             </div>
           );
         }
@@ -381,10 +405,11 @@ const Content = ({ activeList, setActiveList, username, userId }) => {
           console.log("Tasks in a list");
           return (
             <div className="flex flex-col">
-              <div className="text-xl font-bold text-gray-600 border-b-2 border-green-200 pt-6 pb-2 px-6">List {activeList} </div>
+              <Header />
+              {/* <div className="text-xl font-bold text-gray-600 border-b-2 border-green-200 pt-6 pb-2 px-6">List {activeList} </div> */}
               {/*Body div */}
               <div >
-                <CreateTask listname={activeList} taskAdded={taskAdded => setTaskAdded(taskAdded)} text="CREATE NEW TASK" buttonText="CREATE TASK" userId={userId} />
+                <CreateTask token={token} listname={activeList} taskAdded={taskAdded => setTaskAdded(taskAdded)} text="CREATE NEW TASK" buttonText="CREATE TASK" token={token} />
                 {/* Edit/Delete list buttons */}
                 <Buttons />
                 {items.map((item) => {
@@ -406,9 +431,10 @@ const Content = ({ activeList, setActiveList, username, userId }) => {
         console.log("An empty list is selected");
         return (
           <div className="flex flex-col">
-            <div className="text-xl font-bold text-gray-600 border-b-2 border-green-200 pt-6 pb-2 px-6">List {activeList} </div>
+            <Header />
+            {/* <div className="text-xl font-bold text-gray-600 border-b-2 border-green-200 pt-6 pb-2 px-6">List {activeList} </div> */}
             {/*Body div */}
-            <CreateTask listname={activeList} taskAdded={taskAdded => setTaskAdded(taskAdded)} text="CREATE NEW TASK" buttonText="CREATE TASK" userId={userId} />
+            <CreateTask token={token} listname={activeList} taskAdded={taskAdded => setTaskAdded(taskAdded)} text="CREATE NEW TASK" buttonText="CREATE TASK" token={token} />
             {/* Edit/Delete list buttons */}
             <Buttons />
 
@@ -422,8 +448,9 @@ const Content = ({ activeList, setActiveList, username, userId }) => {
     console.log("No active list");
     return (
       <div className="flex flex-col">
-        <h1>{username}</h1>
-        <div className="text-xl font-bold text-gray-600 border-b-2 border-green-200 pt-6 pb-2 px-6">List {activeList} </div>
+
+        <Header />
+        {/* <div className="text-xl font-bold text-gray-600 border-b-2 border-green-200 pt-6 pb-2 px-6">List {activeList} </div> */}
         {/*Body div */}
 
       </div>

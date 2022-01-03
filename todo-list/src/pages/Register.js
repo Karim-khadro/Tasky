@@ -2,6 +2,7 @@
 // Simple Login: email & password 
 import { useNavigate } from 'react-router-dom';
 import { useRef, useState } from "react";
+import { encrypt, postRequest } from "../utile";
 
 
 export default function Register(props) {
@@ -9,43 +10,70 @@ export default function Register(props) {
   const nameInput = useRef();
   const emailInput = useRef();
   const passwordInput = useRef();
-  const [errorMsg,setErrorMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+
 
   const navigate = useNavigate();
 
   console.log(process.env.REACT_APP_BACKEND_API_URL);
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
 
     e.preventDefault();
     const name = nameInput.current.value;
     const email = emailInput.current.value;
     const password = passwordInput.current.value;
 
-    fetch(process.env.REACT_APP_BACKEND_API_URL + '/user/signup', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ "name": name, "email": email, "password": password })
+    var res = await postRequest('/user/signup', null, JSON.stringify({ "name": name, "email": email, "password": password }))
+    if (res.isauth) {
+      const cipherToekn = encrypt(res.refreshtoken);
+      sessionStorage.setItem('refreshToken', cipherToekn);
+      sessionStorage.setItem('isAuth', res.isauth);
+      // Changing the stat of the parent 
+      props.setUsername(res.username);
+      props.setToken(res.token);
+      // props.setAuth(true);
+      // setInterval(renewToken, parseInt(res.refreshtoken_age) * 1000);
 
-    }).then(res => res.json())
-      .then(res => {
-        console.log(res);
-        if (res.isauth) {
-          // Changing the stat of the parent 
-          props.loggedin(true);
-          props.getusername(res.username);
-          props.userId(res.userid); 
-          // To go the main page
-          navigate("/");
-        }
-        else {
-          setErrorMsg(res.errormsg);
-          props.loggedin(false);
-        }
-      })
-      .catch(err => console.error(err));
+      // To go the main page
+      navigate("/");
+    }
+    else {
+      setErrorMsg(res.errormsg);
+      // props.setAuth(false);
+      sessionStorage.setItem('isAuth', res.isauth);
+    }
+
+    // fetch(process.env.REACT_APP_BACKEND_API_URL + '/user/signup', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Accept': 'application/json, text/plain, */*',
+    //     'Content-Type': 'application/json'
+    //   },
+    //   body: JSON.stringify({ "name": name, "email": email, "password": password })
+
+    // }).then(res => res.json())
+    //   .then(res => {
+    //     console.log(res);
+    //     if (res.isauth) {
+    //       const cipherToekn = encrypt(res.refreshtoken);
+    //       sessionStorage.setItem('refreshToken', cipherToekn);
+    //       sessionStorage.setItem('isAuth', res.isauth);
+    //       // Changing the stat of the parent 
+    //       props.setUsername(res.username);
+    //       props.setToken(res.token);
+    //       // props.setAuth(true);
+    //       // setInterval(renewToken, parseInt(res.refreshtoken_age) * 1000);
+
+    //       // To go the main page
+    //       navigate("/");
+    //     }
+    //     else {
+    //       setErrorMsg(res.errormsg);
+    //       // props.setAuth(false);
+    //       sessionStorage.setItem('isAuth', res.isauth);
+    //     }
+    //   })
+    //   .catch(err => console.error(err));
   }
 
   return (
@@ -61,9 +89,9 @@ export default function Register(props) {
             <label>Password</label>
             <input required="required" ref={passwordInput} type="password" id="password" className="border-2 w-full mb-4 h-8"></input>
           </div>
-          <h2 className=' text-red-600 mb-3'>{errorMsg}</h2> 
+          <h2 className=' text-red-600 mb-3'>{errorMsg}</h2>
           <div className="ml-2 mb-4 ">
-            
+
             <button type="submit" className=" bg-green-500 rounded-lg border-2 border-green-500 w-1/3 h-10 text-xl text-white ">Sign up</button>
           </div>
           <a href='/login' className="ml-2 mb-4 text-blue-600 underline ">Sign in</a>

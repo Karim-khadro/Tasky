@@ -56,11 +56,6 @@ router.post('/login', (req, res) => {
             const token = util.generateAccessToken(tokeninfo);
             const refresh_token = util.generateAccessToken(tokeninfo, true);
 
-            // res.cookie('token', refresh_token, {
-            //    expires: new Date(Date.now() + 50000), // time until expiration
-            //    secure: false, // set to true if your using https
-            //    httpOnly: true,
-            // });
             var refTokenAge = process.env.REFRESH_TOKEN_AGE.replace("s", "");
             refTokenAge = Math.floor(parseInt(refTokenAge) - parseInt(refTokenAge) * 0.3)
             response = {
@@ -68,7 +63,6 @@ router.post('/login', (req, res) => {
                token: token,
                refreshtoken: refresh_token,
                refreshtoken_age: refTokenAge,
-               userid: result[0].id,
                username: result[0].name
             };
          }
@@ -112,66 +106,46 @@ router.post('/signup', (req, res) => {
             throw err;
       }
       else {
+         const tokeninfo = { userid: id, username: name }
+         const token = util.generateAccessToken(tokeninfo);
+         const refresh_token = util.generateAccessToken(tokeninfo, true);
+
+         var refTokenAge = process.env.REFRESH_TOKEN_AGE.replace("s", "");
+         refTokenAge = Math.floor(parseInt(refTokenAge) - parseInt(refTokenAge) * 0.3)
          response = {
             isauth: true,
-            userid: id,
+            token: token,
+            refreshtoken: refresh_token,
+            refreshtoken_age: refTokenAge,
             username: name
          };
+
          res.end(JSON.stringify(response));
       }
    });
 })
 
-
-router.use((req, res, next) => {
-   const token = req.headers.authorization.split(' ')[1]; // Get your token from the request
-   const tokenType = req.headers.token;
-   if (tokenType == "token") {
-      jwt.verify(token, process.env.TOKEN_SECRET, function (err, decoded) {
-         if (err) {
-
-            throw new Error(err)
-         }  // Manage different errors here (Expired, untrusted...)
-         req.auth = decoded // If no error, token info is returned in 'decoded'
-         next()
-      });
-   }
-   else if (tokenType == "ref_token") {
-      jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, function (err, decoded) {
-         if (err) {
-            console.log(err);
-            if (err.name != "TokenExpiredError") {
-               throw new Error(err)
-            }
-
-
-         }  // Manage different errors here (Expired, untrusted...)
-         req.auth = decoded // If no error, token info is returned in 'decoded'
-         next()
-      });
-   }
-})
-
 router.get('/newtoken', (req, res) => {
    console.log("New token");
    var authorization = req.headers.authorization.split(' ')[1];
-   // console.log("\nauthorization: ");
-   // console.log(authorization);
+   console.log("\nauthorization: ");
+   console.log(authorization);
    var decoded;
    var response = {}
-
    try {
-      console.log("\ndecoded:");
       decoded = jwt.verify(authorization, process.env.REFRESH_TOKEN_SECRET);
 
-      console.log(decoded);
       // TODO: make it function
       const tokeninfo = { userid: decoded.userid, username: decoded.username }
       const token = util.generateAccessToken(tokeninfo);
       const refresh_token = util.generateAccessToken(tokeninfo, true);
       var refTokenAge = process.env.REFRESH_TOKEN_AGE.replace("s", "");
       refTokenAge = Math.floor(parseInt(refTokenAge) - parseInt(refTokenAge) * 0.3)
-
+      
+      console.log("\nrefTokenAge:");
+      console.log(refTokenAge);
+      console.log("\nAT:");
+      console.log(new Date());
       response = {
          isauth: true,
          token: token,

@@ -1,5 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import { format } from 'date-fns';
+import {postRequest, getRequest} from "../utile";
+
 const CreateTask = (props) => {
     const nameInput = useRef();
     const dateInput = useRef();
@@ -13,7 +15,7 @@ const CreateTask = (props) => {
         }
     }, [props.edit, props.name, props.date]);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         const name = nameInput.current.value;
         const date = dateInput.current.value;
         e.preventDefault();
@@ -21,49 +23,67 @@ const CreateTask = (props) => {
         // edit task => edit name or date of a task
         if (props.edit) {
             console.log("date: " + date);
-            fetch(process.env.REACT_APP_BACKEND_API_URL + '/task/edit', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json, text/plain, */*',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ "taskid": props.taskid, "list": props.listname, "date": date, "name": props.name, "status": "edit", "newname": name, "userid": props.userId })
-            }).then(res => res.json())
-                .then(res => {
-                    console.log(res);
-                    if (res === true) {
-                        props.taskAdded(true);
-                        setNameValue("");
-                        setDateValue("");
-                    }
-                })
-                .catch(err => console.error(err));
+            var res = await postRequest('/task/edit', props.token, JSON.stringify({ "taskid": props.taskid, "list": props.listname, "date": date, "name": props.name, "status": "edit", "newname": name }))
+            if (res === true) {
+                props.taskAdded(true);
+                setNameValue("");
+                setDateValue("");
+            }
+
+            // fetch(process.env.REACT_APP_BACKEND_API_URL + '/task/edit', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Accept': 'application/json, text/plain, */*',
+            //         'Content-Type': 'application/json',
+            //         "token": "token",
+            //         'Authorization': "Bearer " + props.token
+            //     },
+            //     body: JSON.stringify({ "taskid": props.taskid, "list": props.listname, "date": date, "name": props.name, "status": "edit", "newname": name })
+            // }).then(res => res.json())
+            //     .then(res => {
+            //         console.log(res);
+            //         if (res === true) {
+            //             props.taskAdded(true);
+            //             setNameValue("");
+            //             setDateValue("");
+            //         }
+            //     })
+            //     .catch(err => console.error(err));
         }
         // Create new task
         else {
-            fetch(process.env.REACT_APP_BACKEND_API_URL + '/task/create', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json, text/plain, */*',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ "list": props.listname, "name": name, "date": date, "userid": props.userId })
-            }).then(res => res.json())
-                .then(res => {
-                    console.log(res);
-                    if (res.added === true) {
-                        props.taskAdded(true);
-                    }
-                    setNameValue("");
-                    setDateValue("");
-                })
-                .catch(err => console.error(err));
+            var res = await postRequest('/task/create', props.token, JSON.stringify({ "list": props.listname, "name": name, "date": date }))
+            if (res.added === true) {
+                props.taskAdded(true);
+            }
+            setNameValue("");
+            setDateValue("");
+            // fetch(process.env.REACT_APP_BACKEND_API_URL + '/task/create', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Accept': 'application/json, text/plain, */*',
+            //         'Content-Type': 'application/json',
+            //         "token": "token",
+            //         'Authorization': "Bearer " + props.token
+            //     },
+            //     body: JSON.stringify({ "list": props.listname, "name": name, "date": date })
+            // }).then(res => res.json())
+            //     .then(res => {
+            //         console.log(res);
+            //         if (res.added === true) {
+            //             props.taskAdded(true);
+            //         }
+            //         setNameValue("");
+            //         setDateValue("");
+            //     })
+            //     .catch(err => console.error(err));
         }
     }
     return (
-        <div id="newtask" name="newtask">
+        <div >
+            <a name="newtask" />
             <div className="w-full max-w-4xl m-auto mt-3 ">
-                < h1 className="text-3xl  text-gray-600">{props.text}</h1>
+                < h1 className="text-3xl  text-gray-600 pt-24">{props.text}</h1>
             </div>
             <div className={'w-full max-w-4xl m-auto  max-h-2xl bg-gray-100   \
                 border border-primaryBorder shadow-default shadow-lg mt-6 py-4 mb-28'} >

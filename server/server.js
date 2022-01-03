@@ -22,32 +22,31 @@ app.use(cors(corsOptions))
 app.use(express.json())
 app.use(cookieParser());
 app.use((req, res, next) => {
-   console.log("\n\n------------")
-   console.log(req.originalUrl)
-   console.log("------------\n\n")
-   if (req.originalUrl != "\/user\/login" && req.originalUrl != "\/user\/signup") {
+   // console.log("\n\n------------")
+   // console.log(req.originalUrl)
+   // console.log("------------\n\n")
+   
+   if (req.originalUrl != "\/user\/login" && req.originalUrl != "\/user\/signup" && req.originalUrl !="\/logo192.png" && req.originalUrl != "\/favicon.ico") {
       const token = req.headers.authorization.split(' ')[1]; // Get your token from the request
       const tokenType = req.headers.token;
       if (tokenType == "token") {
+         console.log("tokenType: token");
          jwt.verify(token, process.env.TOKEN_SECRET, function (err, decoded) {
             if (err) {
-
-               throw new Error(err)
-            }  // Manage different errors here (Expired, untrusted...)
+               console.log(err);
+               res.status(401).send('Token error');
+            } 
             req.auth = decoded // If no error, token info is returned in 'decoded'
             next()
          });
       }
       else if (tokenType == "ref_token") {
+         console.log("tokenType: ref_token");
          jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, function (err, decoded) {
             if (err) {
                console.log(err);
-               if (err.name != "TokenExpiredError") {
-                  throw new Error(err)
-               }
-
-
-            }  // Manage different errors here (Expired, untrusted...)
+               res.status(401).send('Token error');
+            } 
             req.auth = decoded // If no error, token info is returned in 'decoded'
             next()
          });

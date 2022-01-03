@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import { postRequest, getRequest } from "../utile";
 const Task = (props) => {
   const [taskId, setTaskId] = useState("");
   useEffect(() => {
@@ -28,7 +28,7 @@ const Task = (props) => {
 
 };
 
-function handelStatusChange(props, action, id) {
+async function handelStatusChange(props, action, id) {
   var newStatus = "";
 
   // work on Task is active again
@@ -38,21 +38,28 @@ function handelStatusChange(props, action, id) {
   else
     newStatus = action;
 
-  fetch(process.env.REACT_APP_BACKEND_API_URL + '/task/edit', {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json, text/plain, */*',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ "taskid": id, "list": props.listname, "name": props.name, "date": props.date, "status": newStatus })
-  }).then(res => res.json())
-    .then(res => {
-      if (res === true) {
-        props.taskAModified(true);
-      }
+  var res = await postRequest('/task/edit', props.token, JSON.stringify({ "taskid": id, "list": props.listname, "name": props.name, "date": props.date, "status": newStatus }))
+  if (res === true) {
+    props.taskAModified(true);
+  }
 
-    })
-    .catch(err => console.error(err));
+  // fetch(process.env.REACT_APP_BACKEND_API_URL + '/task/edit', {
+  //   method: 'POST',
+  //   headers: {
+  //     'Accept': 'application/json, text/plain, */*',
+  //     'Content-Type': 'application/json',
+  //     "token": "token",
+  //     'Authorization': "Bearer " + props.token
+  //   },
+  //   body: JSON.stringify({ "taskid": id, "list": props.listname, "name": props.name, "date": props.date, "status": newStatus })
+  // }).then(res => res.json())
+  //   .then(res => {
+  //     if (res === true) {
+  //       props.taskAModified(true);
+  //     }
+
+  //   })
+  //   .catch(err => console.error(err));
 };
 
 function handelEdit(props, id) {

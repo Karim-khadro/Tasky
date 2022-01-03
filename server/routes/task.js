@@ -53,7 +53,7 @@ router.post('/edit', (req, res) => {
 router.post('/create', async (req, res) => {
    console.log("Add task");
    var listname = req.body.list;
-   var userid = req.body.userid;
+   var userid = req.auth.userid;;
    var name = req.body.name;
    var date = req.body.date;
    date = new Date(date);
