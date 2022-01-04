@@ -17,8 +17,8 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   // sessionStorage.removeItem('refreshToken');
+
   function renewToken() {
-    //get the mins of the current time
     var refToken = sessionStorage.getItem('refreshToken');
     if (refToken) {
       console.log('renewToken');

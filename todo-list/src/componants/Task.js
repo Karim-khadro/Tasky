@@ -12,8 +12,10 @@ const Task = (props) => {
       return <Item id={props.id} borderColor={"border-green-400"} props={props} taskStatus={"Completed"} doneStroke={"#0f0"} incompleteStroke={"#000"} />
     case "progress":
       var date = new Date(props.date);
-      // const dateLimit = moment(item.limit, 'YYYY-MM-DDTHH:mm:ss.SSSZ');
-      const now = new Date();
+     
+      date.setDate(date.getDate()+ 1);
+     
+      const now =new Date();
       if (now > date)
         return <Item id={props.id} borderColor={"border-yellow-400"} props={props} taskStatus={"Progress"} status={"Completed"} doneStroke={"#000"} incompleteStroke={"#000"} datecolor={"text-red-700"} />
       return <Item id={props.id} borderColor={"border-yellow-400"} props={props} taskStatus={"Progress"} status={"Completed"} doneStroke={"#000"} incompleteStroke={"#000"} />

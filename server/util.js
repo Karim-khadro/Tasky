@@ -42,15 +42,33 @@ function getListId(listname, userid) {
 }
 
 
-function generateAccessToken(data,refresh= false) {
-   if(refresh)
+function generateAccessToken(data, refresh = false) {
+   if (refresh)
       return jwt.sign(data, process.env.REFRESH_TOKEN_SECRET, { expiresIn: process.env.REFRESH_TOKEN_AGE });
    return jwt.sign(data, process.env.TOKEN_SECRET, { expiresIn: process.env.TOKEN_AGE });
 }
 
 
+function getTokens(username, userid) {
+   const tokeninfo = { userid: userid, username: username }
+   const token = generateAccessToken(tokeninfo);
+   const refresh_token = generateAccessToken(tokeninfo, true);
 
- 
+   var refTokenAge = process.env.REFRESH_TOKEN_AGE.replace("s", "");
+   refTokenAge = Math.floor(parseInt(refTokenAge) - parseInt(refTokenAge) * 0.2)
+   const response = {
+      isauth: true,
+      token: token,
+      refreshtoken: refresh_token,
+      refreshtoken_age: refTokenAge,
+      username: username
+   };
+   return response;
+}
+
+
+
+module.exports.getTokens = getTokens;
 module.exports.generateAccessToken = generateAccessToken;
 module.exports.getListId = getListId;
 module.exports.con = con; 

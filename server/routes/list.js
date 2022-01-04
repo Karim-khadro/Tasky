@@ -11,8 +11,6 @@ const util = require('../util');
 //         Throw error if not
 router.get('/load', (req, res) => {
    console.log("Get all user's list");
-   req.auth
-   console.log(req.auth);
 
    var userid = req.auth.userid;
    var response = {};

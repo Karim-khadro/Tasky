@@ -48,23 +48,9 @@ router.post('/login', (req, res) => {
                   console.log(err);
                   throw err;
                }
-               // console.log(res.affectedRows + " record updated after login");
             });
-
-            // User's token
-            const tokeninfo = { userid: result[0].id, username: result[0].name }
-            const token = util.generateAccessToken(tokeninfo);
-            const refresh_token = util.generateAccessToken(tokeninfo, true);
-
-            var refTokenAge = process.env.REFRESH_TOKEN_AGE.replace("s", "");
-            refTokenAge = Math.floor(parseInt(refTokenAge) - parseInt(refTokenAge) * 0.3)
-            response = {
-               isauth: true,
-               token: token,
-               refreshtoken: refresh_token,
-               refreshtoken_age: refTokenAge,
-               username: result[0].name
-            };
+            
+            response = util.getTokens(username = result[0].name, userid = result[0].id);
          }
          res.end(JSON.stringify(response));
       }
@@ -106,20 +92,7 @@ router.post('/signup', (req, res) => {
             throw err;
       }
       else {
-         const tokeninfo = { userid: id, username: name }
-         const token = util.generateAccessToken(tokeninfo);
-         const refresh_token = util.generateAccessToken(tokeninfo, true);
-
-         var refTokenAge = process.env.REFRESH_TOKEN_AGE.replace("s", "");
-         refTokenAge = Math.floor(parseInt(refTokenAge) - parseInt(refTokenAge) * 0.3)
-         response = {
-            isauth: true,
-            token: token,
-            refreshtoken: refresh_token,
-            refreshtoken_age: refTokenAge,
-            username: name
-         };
-
+         response = util.getTokens(username = name, userid =id );
          res.end(JSON.stringify(response));
       }
    });
@@ -135,28 +108,9 @@ router.get('/newtoken', (req, res) => {
    try {
       decoded = jwt.verify(authorization, process.env.REFRESH_TOKEN_SECRET);
 
-      // TODO: make it function
-      const tokeninfo = { userid: decoded.userid, username: decoded.username }
-      const token = util.generateAccessToken(tokeninfo);
-      const refresh_token = util.generateAccessToken(tokeninfo, true);
-      var refTokenAge = process.env.REFRESH_TOKEN_AGE.replace("s", "");
-      refTokenAge = Math.floor(parseInt(refTokenAge) - parseInt(refTokenAge) * 0.3)
-      
-      console.log("\nrefTokenAge:");
-      console.log(refTokenAge);
-      console.log("\nAT:");
-      console.log(new Date());
-      response = {
-         isauth: true,
-         token: token,
-         refreshtoken: refresh_token,
-         refreshtoken_age: refTokenAge,
-         userid: decoded.userid,
-         username: decoded.username
-      };
+      response = util.getTokens(username = decoded.username, userid = decoded.userid);
       res.end(JSON.stringify(response));
 
-      // console.log(decoded);
    } catch (e) {
       response = {
          isauth: false
