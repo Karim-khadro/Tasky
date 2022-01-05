@@ -2,6 +2,7 @@ var mysql = require('mysql');
 require('custom-env').env('dev')
 const dotenv = require("dotenv");
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 // Configs
 dotenv.config()
@@ -67,7 +68,21 @@ function getTokens(username, userid) {
 }
 
 
+function hashIt(password) {
+   const salt = bcrypt.genSaltSync(6);
+   const hashed = bcrypt.hashSync(password, salt);
+   return hashed
+}
 
+// compare the password user entered with hashed pass.
+function compareIt(password, hashedPassword) {
+   const validPassword = bcrypt.compareSync(password, hashedPassword);
+   return validPassword
+}
+
+
+module.exports.hashIt = hashIt;
+module.exports.compareIt = compareIt;
 module.exports.getTokens = getTokens;
 module.exports.generateAccessToken = generateAccessToken;
 module.exports.getListId = getListId;

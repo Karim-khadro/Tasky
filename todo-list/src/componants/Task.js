@@ -45,23 +45,7 @@ async function handelStatusChange(props, action, id) {
     props.taskAModified(true);
   }
 
-  // fetch(process.env.REACT_APP_BACKEND_API_URL + '/task/edit', {
-  //   method: 'POST',
-  //   headers: {
-  //     'Accept': 'application/json, text/plain, */*',
-  //     'Content-Type': 'application/json',
-  //     "token": "token",
-  //     'Authorization': "Bearer " + props.token
-  //   },
-  //   body: JSON.stringify({ "taskid": id, "list": props.listname, "name": props.name, "date": props.date, "status": newStatus })
-  // }).then(res => res.json())
-  //   .then(res => {
-  //     if (res === true) {
-  //       props.taskAModified(true);
-  //     }
-
-  //   })
-  //   .catch(err => console.error(err));
+  
 };
 
 function handelEdit(props, id) {

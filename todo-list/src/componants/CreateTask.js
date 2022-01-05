@@ -30,25 +30,6 @@ const CreateTask = (props) => {
                 setDateValue("");
             }
 
-            // fetch(process.env.REACT_APP_BACKEND_API_URL + '/task/edit', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Accept': 'application/json, text/plain, */*',
-            //         'Content-Type': 'application/json',
-            //         "token": "token",
-            //         'Authorization': "Bearer " + props.token
-            //     },
-            //     body: JSON.stringify({ "taskid": props.taskid, "list": props.listname, "date": date, "name": props.name, "status": "edit", "newname": name })
-            // }).then(res => res.json())
-            //     .then(res => {
-            //         console.log(res);
-            //         if (res === true) {
-            //             props.taskAdded(true);
-            //             setNameValue("");
-            //             setDateValue("");
-            //         }
-            //     })
-            //     .catch(err => console.error(err));
         }
         // Create new task
         else {
@@ -58,25 +39,7 @@ const CreateTask = (props) => {
             }
             setNameValue("");
             setDateValue("");
-            // fetch(process.env.REACT_APP_BACKEND_API_URL + '/task/create', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Accept': 'application/json, text/plain, */*',
-            //         'Content-Type': 'application/json',
-            //         "token": "token",
-            //         'Authorization': "Bearer " + props.token
-            //     },
-            //     body: JSON.stringify({ "list": props.listname, "name": name, "date": date })
-            // }).then(res => res.json())
-            //     .then(res => {
-            //         console.log(res);
-            //         if (res.added === true) {
-            //             props.taskAdded(true);
-            //         }
-            //         setNameValue("");
-            //         setDateValue("");
-            //     })
-            //     .catch(err => console.error(err));
+          
         }
     }
     return (
@@ -101,6 +64,7 @@ const CreateTask = (props) => {
                         {/* Right col */}
                         <label className="ml-3 text-xl text-black font-semibold">Due date</label>
                         <input value={dateValue} onChange={(e) => setDateValue(e.target.value)} className="ml-3 py-3 border border-gray-400 mr-3 px-4" ref={dateInput} type="date" required="required"></input>
+                        <button>cancel</button>
                     </div>
                 </form>
             </div>

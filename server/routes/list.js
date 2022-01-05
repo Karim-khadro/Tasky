@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-// const util.con = require('../dbConnection');
 const util = require('../util');
+const logger = require('../logger');
 
 // * DONE
 // Get all the lists of a user
@@ -10,15 +10,14 @@ const util = require('../util');
 // Return: all the list of the user
 //         Throw error if not
 router.get('/load', (req, res) => {
-   console.log("Get all user's list");
-
+   logger.info(`list/load `);
    var userid = req.auth.userid;
    var response = {};
    var sql = "SELECT name FROM lists WHERE user_id = ?";
 
    util.con.query(sql, [userid], function (err, result) {
       if (err) {
-         console.log(err);
+         logger.error(`/list/load ${err}`);
          throw err;
       }
       if (!result.length) {
@@ -39,20 +38,17 @@ router.get('/load', (req, res) => {
 // Return: all the tasks of the list
 //         Throw error if not
 router.get('/tasks', async (req, res) => {
-   console.log("Get all list's tasks");
-
+   logger.info(`list/tasks `);
    var listname = req.query.list;
    var userid = req.auth.userid;
    var response = {}
    var sql = "SELECT id,name,status,date FROM tasks WHERE list_id = ? ORDER BY date";
    var listId = await util.getListId(listname, userid);
-   console.log("listId: ")
-   console.log(listId);
    listId = await listId.id;
 
    util.con.query(sql, [listId], function (err, result) {
       if (err) {
-         console.log(err);
+         logger.error(`/list/tasks ${err}`);
          throw err;
       }
       // Date formating
@@ -73,17 +69,17 @@ router.get('/tasks', async (req, res) => {
 // Return: true if the list is deleted
 //         Throw error if not
 router.post('/delete', (req, res) => {
-   console.log("Delete list");
+   logger.info(`/list/delete `);
    var listname = req.body.list;
    var userid = req.auth.userid;
    var sql_q = "DELETE FROM lists WHERE user_id = ? AND name = ? ";
 
    util.con.query(sql_q, [userid, listname], function (err, result) {
       if (err) {
-         console.log(err);
+         logger.error(`/list/delet ${err}`);
          throw err;
       }
-      console.log(res.affectedRows + " record updated ");
+      logger.info(`/list/delete ${res.affectedRows} record updated`);
       res.end(JSON.stringify(true));
    });
 
@@ -97,7 +93,7 @@ router.post('/delete', (req, res) => {
 // Return: true if the name is changed
 //         Throw error if not
 router.post('/edit', (req, res) => {
-   console.log("Edit list");
+   logger.info(`/list/edit `);
    var listname = req.body.list;
    var newlistname = req.body.newlist;
    var userid = req.auth.userid;
@@ -106,10 +102,10 @@ router.post('/edit', (req, res) => {
 
    util.con.query(sql_q, [newlistname, modifAt, userid, listname], function (err, result) {
       if (err) {
-         console.log(err);
+         logger.error(`/list/edit ${err}`);
          throw err;
       }
-      console.log(res.affectedRows + " record updated");
+      logger.info(`/list/edit ${res.affectedRows} record updated`);
       res.end(JSON.stringify(true));
    });
 })
@@ -121,7 +117,7 @@ router.post('/edit', (req, res) => {
 // Return: true if a new list is added to the DB
 //         Throw error if not
 router.post('/create', (req, res) => {
-   console.log("Add new list");
+   logger.info(`/list/create `);
    var listname = req.body.list;
    var userid = req.auth.userid;
    var createdAt = new Date();
@@ -131,7 +127,7 @@ router.post('/create', (req, res) => {
    var sql = "SELECT name FROM lists WHERE name = ? AND user_id = ?";
    util.con.query(sql, [listname, userid], function (err, result) {
       if (err) {
-         console.log(err);
+         logger.error(`/list/create at SELECT ${err}`);
          throw err;
       }
       if (result.length > 0) {
@@ -143,7 +139,7 @@ router.post('/create', (req, res) => {
          var values = [[listname, createdAt, userid]];
          util.con.query(sql, [values], function (err, result) {
             if (err) {
-               console.log(err);
+               logger.error(`/list/create at INSERT ${err}`);
                throw err;
             }
             else {

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const util = require('../util');
+const logger = require('../logger');
 
 // * DONE
 // Edit existing task
@@ -9,7 +10,7 @@ const util = require('../util');
 // Return: true if the task is modified/deleted
 //         Throw error if not
 router.post('/edit', (req, res) => {
-   console.log("Edit task");
+   logger.info(`/task/edit`);
    var status = req.body.status;
    var taskid = req.body.taskid;
    var sql = "";
@@ -19,10 +20,10 @@ router.post('/edit', (req, res) => {
    if (status === "delete") {
       sql = "DELETE FROM tasks WHERE id = ?";
       values = taskid;
-      console.log("DELETE task");
+      logger.info("DELETE task");
    }
    else if (status === "edit") {
-      console.log("EDIT task name/date");
+      logger.info("EDIT task name/date");
       var newname = req.body.newname;
       var date = req.body.date;
       sql = "UPDATE tasks SET name = ?, date = ?, modified_at = ? WHERE id = ?";
@@ -30,13 +31,13 @@ router.post('/edit', (req, res) => {
 
    }
    else {
-      console.log("EDIT task status");
+      logger.info("EDIT task status");
       sql = "UPDATE tasks SET status = ?,modified_at=? WHERE id = ?";
       values = [status, modifAt, taskid];
    }
    util.con.query(sql, values, function (err, result) {
       if (err) {
-         console.log(err);
+         logger.error(`/task/edit ${err} `);
          throw err;
       }
       res.end(JSON.stringify(true));
@@ -51,7 +52,7 @@ router.post('/edit', (req, res) => {
 //                                 taskid
 //         Throw error if not
 router.post('/create', async (req, res) => {
-   console.log("Add task");
+   logger.info(`/task/create`);
    var listname = req.body.list;
    var userid = req.auth.userid;;
    var name = req.body.name;
@@ -68,7 +69,7 @@ router.post('/create', async (req, res) => {
 
    util.con.query(sql, [values], function (err, result) {
       if (err) {
-         console.log(err);
+         logger.error(`/task/create ${err} `);
          throw err;
       }
       else {
