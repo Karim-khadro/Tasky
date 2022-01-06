@@ -3,6 +3,8 @@ require('custom-env').env('dev')
 const dotenv = require("dotenv");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const logger = require('./logger');
+
 
 // Configs
 dotenv.config()
@@ -21,7 +23,7 @@ con.connect(function (err) {
       console.log(err);
       throw err;
    }
-   console.log("Connected from DB!");
+   logger.info("Connected from DB!");
 });
 
 
@@ -29,7 +31,7 @@ con.connect(function (err) {
 // Params: listname & userid 
 // Return: listId or error
 function getListId(listname, userid) {
-   console.log("getListId function");
+   logger.info("getListId function");
    var sql = "SELECT id FROM lists WHERE name = ? AND user_id = ?";
    return new Promise((resolve, reject) => {
       con.query(
