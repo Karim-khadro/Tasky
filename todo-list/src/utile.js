@@ -5,10 +5,6 @@ export function decrypt(ciphertext) {
     // Decrypt
     var bytes = CryptoJS.AES.decrypt(ciphertext, process.env.REACT_APP_ENCRYPT_SECRET);
     var decryptedData = bytes.toString(CryptoJS.enc.Utf8);
-
-    //log decrypted Data
-    // console.log('decrypted Data -')
-    // console.log(decryptedData);
     return decryptedData;
 }
 
@@ -16,9 +12,6 @@ export function decrypt(ciphertext) {
 export function encrypt(data) {
     // Encrypt
     var ciphertext = CryptoJS.AES.encrypt(data, process.env.REACT_APP_ENCRYPT_SECRET).toString();
-    //log encrypted data
-    // console.log('Encrypt Data -')
-    // console.log(ciphertext);
     return ciphertext;
 }
 

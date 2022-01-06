@@ -107,21 +107,6 @@ const Content = ({ activeList, setActiveList, username, token }) => {
   const fetchItems = async () => {
     var resultGet = await getRequest('/list/tasks?list=' + encodeURIComponent(activeList), token)
     setItems(resultGet.items);
-
-    // fetch(process.env.REACT_APP_BACKEND_API_URL + '/list/tasks?list=' + encodeURIComponent(activeList) + '&token=' + encodeURIComponent(token), {
-    //   method: 'Get',
-    //   headers: {
-    //     'Accept': 'application/json, text/plain, */*', 
-    //     "token": "token",
-    //     'Authorization': "Bearer " + token
-
-    //   },
-    // }).then(res => res.json())
-    //   .then(res => {
-    //     console.log(`res: ${res.items}`);
-    //     setItems(res.items);
-    //   })
-    //   .catch(err => console.error(err));
   };
 
 
@@ -136,27 +121,6 @@ const Content = ({ activeList, setActiveList, username, token }) => {
       setActiveList("");
       setTaskAModified(true);
     }
-    console.log(resultpost)
-    // fetch(process.env.REACT_APP_BACKEND_API_URL +'/list/delete', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Accept': 'application/json, text/plain, */*',
-    //     'Content-Type': 'application/json', 
-    //     "token": "token",
-    //     'Authorization': "Bearer " + token
-    //   },
-    //   body: JSON.stringify({ "list": activeList, "token": token })
-
-    // }).then(res => res.json())
-    //   .then(res => {
-    //     console.log("res: " + res);
-    //     if (res === true) {
-    //       setActiveList("");
-    //       setTaskAModified(true);
-    //     }
-
-    //   })
-    //   .catch(err => console.error(err));
   }
 
   const Buttons = () => (
@@ -319,13 +283,10 @@ const Content = ({ activeList, setActiveList, username, token }) => {
             </div>
           );
         }
-
       }
-
     }
   }
 
-  // TODO: Work here
   const handelLogOut= () =>{
     sessionStorage.removeItem('refreshToken');
     sessionStorage.removeItem('isAuth');
@@ -381,7 +342,6 @@ const Content = ({ activeList, setActiveList, username, token }) => {
           return (
             <div className="flex flex-col">
               <Header />
-              {/* <div className="text-xl font-bold text-gray-600 border-b-2 border-green-200 pt-6 pb-2 px-6">List {activeList} </div> */}
               {/*Body div */}
               <div >
                 <CreateTask token={token} taskid={editTask[3]} edit={true} name={editTask[1]} date={editTask[2]} listname={activeList} taskAdded={taskAdded => setTaskAdded(taskAdded)} text="EDIT TASK" buttonText="EDIT TASK" token={token} />
@@ -406,7 +366,6 @@ const Content = ({ activeList, setActiveList, username, token }) => {
           return (
             <div className="flex flex-col">
               <Header />
-              {/* <div className="text-xl font-bold text-gray-600 border-b-2 border-green-200 pt-6 pb-2 px-6">List {activeList} </div> */}
               {/*Body div */}
               <div >
                 <CreateTask token={token} listname={activeList} taskAdded={taskAdded => setTaskAdded(taskAdded)} text="CREATE NEW TASK" buttonText="CREATE TASK" token={token} />
@@ -432,7 +391,6 @@ const Content = ({ activeList, setActiveList, username, token }) => {
         return (
           <div className="flex flex-col">
             <Header />
-            {/* <div className="text-xl font-bold text-gray-600 border-b-2 border-green-200 pt-6 pb-2 px-6">List {activeList} </div> */}
             {/*Body div */}
             <CreateTask token={token} listname={activeList} taskAdded={taskAdded => setTaskAdded(taskAdded)} text="CREATE NEW TASK" buttonText="CREATE TASK" token={token} />
             {/* Edit/Delete list buttons */}
@@ -450,7 +408,6 @@ const Content = ({ activeList, setActiveList, username, token }) => {
       <div className="flex flex-col">
 
         <Header />
-        {/* <div className="text-xl font-bold text-gray-600 border-b-2 border-green-200 pt-6 pb-2 px-6">List {activeList} </div> */}
         {/*Body div */}
 
       </div>
