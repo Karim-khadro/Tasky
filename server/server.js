@@ -64,7 +64,7 @@ app.use('/task', task);
 
 const host = process.env.SERVER_HOST
 const port = process.env.SERVER_PORT
-app.listen(port, () => logger.info(`app listening at ${host}:${port}`));
+app.listen(process.env.PORT|| port, () => logger.info(`app listening at ${host}:${port}`));
 // var server = app.listen(process.env.SERVER_PORT, function () {
 
 //    logger.info(`app listening at ${host}:${port}`);
