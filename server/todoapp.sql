@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : jeu. 30 déc. 2021 à 21:47
+-- Généré le : jeu. 06 jan. 2022 à 21:19
 -- Version du serveur : 10.4.21-MariaDB
 -- Version de PHP : 7.4.25
 
@@ -38,6 +38,7 @@ CREATE TABLE `lists` (
 --
 -- Déchargement des données de la table `lists`
 --
+
 
 
 -- --------------------------------------------------------
@@ -81,8 +82,6 @@ CREATE TABLE `users` (
 -- Déchargement des données de la table `users`
 --
 
-
-
 --
 -- Index pour les tables déchargées
 --
@@ -116,13 +115,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT pour la table `lists`
 --
 ALTER TABLE `lists`
-  MODIFY `id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT pour la table `tasks`
 --
 ALTER TABLE `tasks`
-  MODIFY `id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- Contraintes pour les tables déchargées

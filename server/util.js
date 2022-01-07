@@ -1,5 +1,5 @@
 var mysql = require('mysql');
-require('custom-env').env('dev')
+require('custom-env').env('prod')
 const dotenv = require("dotenv");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
