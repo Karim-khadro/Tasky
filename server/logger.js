@@ -27,10 +27,7 @@ if (process.env.NODE_ENV !== 'PRODUCTION') {
     logger.add(new transports.File({ filename: 'log/dev/warn.log', level: 'warn' }));
     logger.add(new transports.File({ filename: 'log/dev/info.log', level: 'info' }));
 
-    // Turn these on to create logs as if it were production
-    // logger.add(new transports.File({ filename: 'log/output/error.log', level: 'error' }));
-    // logger.add(new transports.File({ filename: 'log/output/warn.log', level: 'warn' }));
-    // logger.add(new transports.File({ filename: 'log/output/info.log', level: 'info' }));
+
 } else {
     logger.add(new transports.File({ filename: 'log/prod/error.log', level: 'error' }));
     logger.add(new transports.File({ filename: 'log/prod/warn.log', level: 'warn' }));

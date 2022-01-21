@@ -25,7 +25,6 @@ export default function Login(props) {
         if (res.isauth) {
             setErrorMsg("");
             // Encrypt the refresh token & store it
-            // TODO: make it a function
             const cipherToekn = encrypt(res.refreshtoken);
             sessionStorage.setItem('refreshToken', cipherToekn);
 
@@ -46,43 +45,6 @@ export default function Login(props) {
             sessionStorage.setItem('isAuth', res.isauth);
         }
 
-        // // Verify user info with the server
-        // fetch(process.env.REACT_APP_BACKEND_API_URL + '/user/login', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Accept': 'application/json, text/plain, */*',
-        //         'Content-Type': 'application/json'
-        //     },
-        //     body: JSON.stringify({ "email": email, "password": password })
-
-        // }).then(res => res.json())
-        //     .then(res => {
-        //         console.log(res);
-        //         if (res.isauth) {
-        //             setErrorMsg("");
-        //             // Encrypt the refresh token & store it
-        //             // TODO: make it a function
-        //             const cipherToekn = encrypt(res.refreshtoken);
-        //             sessionStorage.setItem('refreshToken', cipherToekn);
-
-        //             sessionStorage.setItem('isAuth', res.isauth);
-        //             // console.log('Encrypt Data -')
-        //             // console.log(cipherToekn);
-
-        //             props.setUsername(res.username);
-        //             props.setToken(res.token);
-        //             // props.setAuth(true);
-        //             // setInterval(renewToken, parseInt(res.refreshtoken_age)*1000);
-
-        //             navigate("/");
-        //         }
-        //         else {
-        //             setErrorMsg(res.errormsg);
-        //             // props.setAuth(false);
-        //             sessionStorage.setItem('isAuth', res.isauth);
-        //         }
-        //     })
-        //     .catch(err => console.error(err));
     }
 
     return (
