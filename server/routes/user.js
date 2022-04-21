@@ -3,7 +3,6 @@ const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
 const util = require('../util');
 const jwt = require('jsonwebtoken');
-// require('custom-env').env('dev')
 const dotenv = require("dotenv");
 const logger = require('../logger');
 

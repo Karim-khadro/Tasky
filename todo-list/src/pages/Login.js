@@ -29,19 +29,13 @@ export default function Login(props) {
             sessionStorage.setItem('refreshToken', cipherToekn);
 
             sessionStorage.setItem('isAuth', res.isauth);
-            // console.log('Encrypt Data -')
-            // console.log(cipherToekn);
 
             props.setUsername(res.username);
-            props.setToken(res.token);
-            // props.setAuth(true);
-            // setInterval(renewToken, parseInt(res.refreshtoken_age)*1000);
-
+            props.setToken(res.token);     
             navigate("/");
         }
         else {
             setErrorMsg(res.errormsg);
-            // props.setAuth(false);
             sessionStorage.setItem('isAuth', res.isauth);
         }
 

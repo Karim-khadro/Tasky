@@ -31,49 +31,14 @@ export default function Register(props) {
       // Changing the stat of the parent 
       props.setUsername(res.username);
       props.setToken(res.token);
-      // props.setAuth(true);
-      // setInterval(renewToken, parseInt(res.refreshtoken_age) * 1000);
 
       // To go the main page
       navigate("/");
     }
     else {
       setErrorMsg(res.errormsg);
-      // props.setAuth(false);
       sessionStorage.setItem('isAuth', res.isauth);
     }
-
-    // fetch(process.env.REACT_APP_BACKEND_API_URL + '/user/signup', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Accept': 'application/json, text/plain, */*',
-    //     'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify({ "name": name, "email": email, "password": password })
-
-    // }).then(res => res.json())
-    //   .then(res => {
-    //     console.log(res);
-    //     if (res.isauth) {
-    //       const cipherToekn = encrypt(res.refreshtoken);
-    //       sessionStorage.setItem('refreshToken', cipherToekn);
-    //       sessionStorage.setItem('isAuth', res.isauth);
-    //       // Changing the stat of the parent 
-    //       props.setUsername(res.username);
-    //       props.setToken(res.token);
-    //       // props.setAuth(true);
-    //       // setInterval(renewToken, parseInt(res.refreshtoken_age) * 1000);
-
-    //       // To go the main page
-    //       navigate("/");
-    //     }
-    //     else {
-    //       setErrorMsg(res.errormsg);
-    //       // props.setAuth(false);
-    //       sessionStorage.setItem('isAuth', res.isauth);
-    //     }
-    //   })
-    //   .catch(err => console.error(err));
   }
 
   return (

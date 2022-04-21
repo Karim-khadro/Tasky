@@ -24,24 +24,6 @@ const CreteList = (props) => {
                 if (res === true) {
                     props.newlist(name);
                 }
-                // fetch(process.env.REACT_APP_BACKEND_API_URL+'/list/edit', {
-                //     method: 'POST',
-                //     headers: {
-                //         'Accept': 'application/json, text/plain, */*',
-                //         'Content-Type': 'application/json', 
-                //         "token": "token",
-                //         'Authorization': "Bearer " + props.token
-                //     },
-                //     body: JSON.stringify({ "list": props.list, "newlist": name })
-
-                // }).then(res => res.json())
-                //     .then(res => {
-                //         if (res === true) {
-                //             props.newlist(name);
-                //         }
-
-                //     })
-                //     .catch(err => console.error(err));
             }
             else {
                 var res = await postRequest('/list/create', props.token, JSON.stringify({ "list": name }))
@@ -51,27 +33,6 @@ const CreteList = (props) => {
                 if (res.error) {
                     setErrormsg(res.error);
                 }
-                // fetch(process.env.REACT_APP_BACKEND_API_URL+'/list/create', {
-                //     method: 'POST',
-                //     headers: {
-                //         'Accept': 'application/json, text/plain, */*',
-                //         'Content-Type': 'application/json', 
-                //         "token": "token",
-                //         'Authorization': "Bearer " + props.token
-                //     },
-                //     body: JSON.stringify({ "list": name })
-
-                // }).then(res => res.json())
-                //     .then(res => {
-                //         console.log("res: " + res);
-                //         if (res === true) {
-                //             props.newlist(name);
-                //         }
-                //         if (res.error) {
-                //             setErrormsg(res.error);
-                //         }
-                //     })
-                //     .catch(err => console.error(err));
             }
         }
     }
@@ -96,12 +57,9 @@ const CreteList = (props) => {
                         
                     </div>
                 </form>
-                
             </div>
-
         </div>
     );
-
 }
 
 export default CreteList;

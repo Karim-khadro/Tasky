@@ -16,8 +16,6 @@ export default function App() {
   const [token, setToken] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  // sessionStorage.removeItem('refreshToken');
-
   function renewToken() {
     var refToken = sessionStorage.getItem('refreshToken');
     if (refToken) {
